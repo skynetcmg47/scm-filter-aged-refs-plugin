@@ -22,14 +22,17 @@ import java.util.Iterator;
  */
 public class BitbucketAgedRefsTrait extends AgedRefsTrait{
 
+    String excludePattern;    
     /**
      * Constructor for stapler.
      *
      * @param retentionDays
+     * @param excludePattern
      */
     @DataBoundConstructor
-    public BitbucketAgedRefsTrait(String retentionDays) {
+    public BitbucketAgedRefsTrait(String retentionDays, String excludePattern) {
         super(retentionDays);
+        this.excludePattern = excludePattern;
     }
 
     @Override
@@ -82,6 +85,9 @@ public class BitbucketAgedRefsTrait extends AgedRefsTrait{
                     BitbucketBranch branch = branchIterator.next();
                     long branchTS = branch.getDateMillis();
                     if (branch.getName().equals(scmHead.getName())) {
+                        if(branch.getName().matches(this.excludePattern)){
+                            return false
+                        }
                         return (Long.compare(branchTS, super.getAcceptableDateTimeThreshold()) < 0);
                     }
                 }
